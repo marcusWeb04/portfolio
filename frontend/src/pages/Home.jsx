@@ -1,22 +1,13 @@
 import { useState, useEffect } from 'react';
 import ProjectCard from '../components/project/ProjectCard.jsx';
+import { getAllProject } from '../service/requestProject.jsx';
 
 function Home() {
     const [project, setProject] = useState([]);
 
     useEffect(() => {
         const handleRequest = async () => {
-            const data = [
-                { id: 1, title: "Portfolio", type: "Projets personnels" },
-                { id: 2, title: "E-commerce", type: "Projets professionnels" },
-                { id: 3, title: "Chat App", type: "POC" },
-                { id: 4, title: "Chat App", type: "POC" },
-                { id: 5, title: "Chat App", type: "POC" },
-                { id: 6, title: "Chat App", type: "POC" },
-                { id: 7, title: "Chat App", type: "POC" },
-                { id: 8, title: "Chat App", type: "POC" },
-                { id: 9, title: "Chat App", type: "POC" }
-            ];
+            const data = await getAllProject();
             setProject(data);
         };
 

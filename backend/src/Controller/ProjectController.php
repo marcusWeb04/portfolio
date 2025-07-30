@@ -15,7 +15,7 @@ class ProjectController extends AbstractController
     {
         $projects = $repository->findAll();
 
-        return $this->json($projects, 200, [], ['groups' => 'project:read']);
+        return $this->json($projects, 200, [], ['groups' => 'public']);
     }
 
     #[Route('/api/projects/find', name: "api_projects_by_category", methods: ['POST'])]
@@ -33,7 +33,7 @@ class ProjectController extends AbstractController
         return $this->json($projects, 200, [], ['groups' => 'project:read']);
     }
 
-    #[Route('/api/projects/create', name: "api_project_create", methods: ['POST'])]
+    #[Route('/api/project/create', name: "api_project_create", methods: ['POST'])]
     public function createProject(Request $request,EntityManagerInterface $entityManager,CategoryRepository $categoryRepository): JsonResponse 
     {
         $data = json_decode($request->getContent(), true);
@@ -68,7 +68,7 @@ class ProjectController extends AbstractController
         return $this->json($project, 201, [], ['groups' => 'project:read']);
     }
 
-    #[Route('/api/projects/edit/{id}', name: 'api_project_edit', methods: ['PUT'])]
+    #[Route('/api/project/edit/{id}', name: 'api_project_edit', methods: ['PUT'])]
     public function editProject(int $id,Request $request,ProjectRepository $projectRepository,CategoryRepository $categoryRepository,EntityManagerInterface $entityManager): JsonResponse 
     {
         $project = $projectRepository->find($id);
@@ -111,7 +111,7 @@ class ProjectController extends AbstractController
         return $this->json($project, 200, [], ['groups' => 'project:read']);
     }
 
-    #[Route('/api/projects/delete/{id}', name: 'api_project_delete', methods: ['DELETE'])]
+    #[Route('/api/project/delete/{id}', name: 'api_project_delete', methods: ['DELETE'])]
     public function deleteProject( int $id, ProjectRepository $projectRepository, EntityManagerInterface $entityManager): JsonResponse
     {
         $project = $projectRepository->find($id);

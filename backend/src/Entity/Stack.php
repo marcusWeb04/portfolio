@@ -18,13 +18,14 @@ class Stack
     #[ORM\Column(length: 255)]
     private ?string $name = null;
 
-    #[ORM\ManyToOne(inversedBy: 'Stacks')]
+    #[ORM\ManyToOne(inversedBy: 'stacks')]
+    #[ORM\JoinColumn(nullable: true)]
     private ?Image $logo = null;
 
     /**
      * @var Collection<int, Project>
      */
-    #[ORM\ManyToMany(targetEntity: Project::class, inversedBy: 'Stacks')]
+    #[ORM\ManyToMany(targetEntity: Project::class, inversedBy: 'stacks')]
     private Collection $projects;
 
     public function __construct()

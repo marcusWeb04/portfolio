@@ -18,7 +18,7 @@ class Category
     #[ORM\Column(length: 255)]
     private ?string $name = null;
 
-    #[ORM\Column(length: 255)]
+    #[ORM\Column(length: 255, nullable: true)]
     private ?string $description = null;
 
     /**
@@ -45,7 +45,6 @@ class Category
     public function setName(string $name): static
     {
         $this->name = $name;
-
         return $this;
     }
 
@@ -54,10 +53,9 @@ class Category
         return $this->description;
     }
 
-    public function setDescription(string $description): static
+    public function setDescription(?string $description): static
     {
         $this->description = $description;
-
         return $this;
     }
 
@@ -73,6 +71,7 @@ class Category
     {
         if (!$this->projects->contains($project)) {
             $this->projects->add($project);
+            $project->addCategory($this);
         }
 
         return $this;
@@ -80,7 +79,9 @@ class Category
 
     public function removeProject(Project $project): static
     {
-        $this->projects->removeElement($project);
+        if ($this->projects->removeElement($project)) {
+            $project->removeCategory($this);
+        }
 
         return $this;
     }
