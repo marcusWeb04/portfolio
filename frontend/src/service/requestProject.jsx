@@ -1,37 +1,4 @@
-import { useState } from "react";
-import API_BASE_URL from "./api";
-
-export async function getAllProject(){
-    try {
-        const response = await fetch(`${API_BASE_URL}/api/projects`,{
-            method: "GET",
-            headers: {
-                accept: 'application/json',
-            },
-        });
-
-        return await response.json();
-    } catch (error) {
-        console.error("Erreur API:", error);
-        throw error;
-    }
-}
-
-export async function getProjectById(project){
-    try {
-        const response = await fetch(`${API_BASE_URL}/api/project/${project.id}`,{
-            method: "GET",
-            headers: {
-                accept: 'application/json',
-            },
-        });
-
-        return await response.json();
-    } catch (error) {
-        console.error("Erreur API:", error);
-        throw error;
-    }
-}
+import {API_BASE_URL} from "./api";
 
 export async function getProjectByType(types){
     try {
@@ -42,7 +9,7 @@ export async function getProjectByType(types){
             },
             body: JSON.stringify(
                 {
-                    "types" : types,
+                    "categories" : types,
                 }
             ),
         });

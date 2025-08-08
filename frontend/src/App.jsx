@@ -1,19 +1,30 @@
 import React, { Suspense } from 'react';
 import { Routes, Route } from 'react-router';
+import PrivateRoute from './components/route/PrivateRoute';
 import './App.css';
 
-// Chargement différé des composants
-const Home = React.lazy(() => import('./pages/Home'));
+// loading page
+const LodingPage = React.lazy(() => import('./pages/loading/LoadingPage'));
 
-const Connexion = React.lazy(() => import('./pages/Connexion'));
+// Chargement différé des composants
+// public
+const Home = React.lazy(() => import('./pages/public/Home'));
+
+// connexion
+const Connexion = React.lazy(() => import('./pages/backoffice/Connexion'));
+
+// backoffice
+const UserProfile = React.lazy(() => import('./pages/backoffice/UserProfile'));
 
 function App() {
   return (
-    <Suspense fallback={<h1>Chargement...</h1>}>
+    <Suspense fallback={<LodingPage />}>
       <Routes>
         <Route path="/" element={<Home />} />
 
         <Route path='/connexion' element={<Connexion />}/>
+
+        <Route path='/myProfil' element={<PrivateRoute> <UserProfile/> </PrivateRoute>}/>
       </Routes>
     </Suspense>
   );

@@ -2,37 +2,39 @@
 
 namespace App\Controller;
 
-use App\Repository\UserRepository;
+use Symfony\Bundle\SecurityBundle\Security;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 
 class UserController extends AbstractController
 {
-    #[Route('/api/projects/edit', name: 'api_project_edit', methods: ['PUT'])]
-    public function editProject(Request $request,ProjectRepository $projectRepository,CategoryRepository $categoryRepository,EntityManagerInterface $entityManager): JsonResponse 
+    #[Route('/api/me', name: 'api_me', methods: ['POST'])]
+    public function me(Security $security): JsonResponse
     {
-        $data = json_decode($request->getContent(), true);
+        $user = $security->getUser();
 
-        if (!$data) {
-            return $this->json(['error' => 'Invalid JSON'], 400);
+        if (!$user) {
+            return new JsonResponse(['error' => 'Unauthorized'], 401);
         }
 
-        if (!empty($data['title'])) {
-            $project->setTitle($data['title']);
-        }
+        return new JsonResponse([
+            'id' => $user->getId(),
+            'email' => $user->getEmail(),
+            // autres infos utiles
+        ]);
+    }
 
-        if (!empty($data['link'])) {
-            $project->setLink($data['link']);
-        }
+    #[Route('/api/logout', name: 'api_logout', methods: ['POST'])]
+    public function logout(): Response
+    {
+        $response = new Response();
+        // Le 3e paramètre est le domaine, mettre null si pas de domaine spécifique
+        // Le 4e et 5e paramètres indiquent HttpOnly et Secure
+        $response->headers->clearCookie('BEARER', '/', null, true, true, 'Strict');
 
-        if (!empty($data['description'])) {
-            $project->setDescription($data['description']);
-        }
-
-        $entityManager->flush();
-
-        return $this->json($project, 200, [], ['groups' => 'project:read']);
+        return $response;
     }
 }
