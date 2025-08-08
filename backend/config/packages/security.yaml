@@ -9,26 +9,39 @@ security:
                 property: email
 
     firewalls:
+        # Authentification via JSON
         login:
-            pattern: /api/login
-            stateless: true
+            pattern: ^/api/login
+            stateless: false
             json_login:
                 check_path: /api/login
                 username_path: email
                 password_path: password
-                success_handler: lexik_jwt_authentication.handler.authentication_success
+                success_handler: App\Security\JWTAuthenticationSuccessHandler
                 failure_handler: lexik_jwt_authentication.handler.authentication_failure
 
+        # Firewall pour sécuriser toutes les autres routes /api
         api:
             pattern: ^/api
-            stateless: true
-            jwt: ~
+            stateless: false
+            custom_authenticators:
+                - App\Security\JwtCookieAuthenticator
 
+        # Accès libre pour dev / debug
         dev:
             pattern: ^/(_(profiler|wdt)|css|images|js)/
             security: false
 
     access_control:
-    - { path: ^/api/login, methods: [OPTIONS], roles: PUBLIC_ACCESS } 
-    - { path: ^/api/projects, methods: [POST], roles: PUBLIC_ACCESS } 
-    - { path: ^/api/projects/find, methods: [POST], roles: PUBLIC_ACCESS } 
+        # Permet les requêtes préflight CORS pour toutes les routes API
+        - { path: ^/api, methods: [OPTIONS], roles: PUBLIC_ACCESS }
+        
+        # Permet les requêtes POST vers /api/login
+        - { path: ^/api/login, methods: [POST], roles: PUBLIC_ACCESS }
+
+        # Permet l'accès public à certaines routes spécifiques
+        - { path: ^/api/projects, methods: [GET], roles: PUBLIC_ACCESS }
+        - { path: ^/api/projects/find, methods: [POST], roles: PUBLIC_ACCESS }
+
+        # Bloque tout le reste si non authentifié
+        - { path: ^/api, roles: IS_AUTHENTICATED_FULLY }

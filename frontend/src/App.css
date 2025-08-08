@@ -1,10 +1,161 @@
 @import "tailwindcss";
 
-html {
-  scroll-behavior: smooth;
+@custom-variant dark (&:where(.theme-dark, .theme-dark *));
+@custom-variant night (&:where(.theme-night, .theme-night *));
+@custom-variant red (&:where(.theme-red, .theme-red *));
+@custom-variant green (&:where(.theme-green, .theme-green *));
+
+@theme {
+  --loading-animation-first-element: ease-in-out;
+  --loading-animation-second-element: ease-in-out;
+  --loading-animation-third-element: ease-in-out;
+  --loading-animation-four-element: ease-in-out;
+
+  @keyframes loading-animation-first-element {
+    0%, 24% {
+      top: 20%;
+      left: 30%;
+      transform: translate(-50%, -50%) scale(1);
+    }
+    26%, 49% {
+      top: 20%;
+      left: 65%;
+      transform: translate(-50%, -50%) scale(1.1);
+    }
+    51%, 74% {
+      top: 70%;
+      left: 65%;
+      transform: translate(-50%, -50%) scale(1);
+    }
+    76%, 99% {
+      top: 70%;
+      left: 30%;
+      transform: translate(-50%, -50%) scale(0.9);
+    }
+  }
+
+  @keyframes loading-animation-second-element {
+    0%, 24% {
+      top: 20%;
+      left: 65%;
+      transform: translate(-50%, -50%) scale(1);
+    }
+    26%, 49% {
+      top: 70%;
+      left: 65%;
+      transform: translate(-50%, -50%) scale(1.1);
+    }
+    51%, 74% {
+      top: 70%;
+      left: 30%;
+      transform: translate(-50%, -50%) scale(1);
+    }
+    76%, 99% {
+      top: 20%;
+      left: 30%;
+      transform: translate(-50%, -50%) scale(0.9);
+    }
+  }
+
+  @keyframes loading-animation-third-element {
+    0%, 24% {
+      top: 70%;
+      left: 65%;
+      transform: translate(-50%, -50%) scale(1);
+    }
+    26%, 49% {
+      top: 70%;
+      left: 30%;
+      transform: translate(-50%, -50%) scale(1.1);
+    }
+    51%, 74% {
+      top: 20%;
+      left: 30%;
+      transform: translate(-50%, -50%) scale(1);
+    }
+    76%, 99% {
+      top: 20%;
+      left: 65%;
+      transform: translate(-50%, -50%) scale(0.9);
+    }
+  }
+
+  @keyframes loading-animation-four-element {
+    0%, 24% {
+      top: 70%;
+      left: 30%;
+      transform: translate(-50%, -50%) scale(1);
+    }
+    26%, 49% {
+      top: 20%;
+      left: 30%;
+      transform: translate(-50%, -50%) scale(1.1);
+    }
+    51%, 74% {
+      top: 20%;
+      left: 65%;
+      transform: translate(-50%, -50%) scale(1);
+    }
+    76%, 99% {
+      top: 70%;
+      left: 65%;
+      transform: translate(-50%, -50%) scale(0.9);
+    }
+  }
 }
 
-a{
-    text-decoration: none;
-    
+/* Variables globales par défaut (theme light) */
+:root {
+  --color-bg: #ffffff;
+  --color-text: #000000;
+  --color-primary: #2563eb;
+}
+
+/* Thème dark */
+.theme-dark {
+  --color-bg: #0f172a;
+  --color-text: #f8fafc;
+  --color-primary: #3b82f6;
+}
+
+/* Thème night */
+.theme-night {
+  --color-bg: #1e1b4b;
+  --color-text: #fef9c3;
+  --color-primary: #c084fc;
+}
+
+/* Thème red */
+.theme-red {
+  --color-bg: #7f1d1d;
+  --color-text: #fff1f2;
+  --color-primary: #ef4444;
+}
+
+/* Thème green */
+.theme-green {
+  --color-bg: #064e3b;
+  --color-text: #ecfdf5;
+  --color-primary: #22c55e;
+}
+
+/* Classes d'animation pour chaque carte */
+.animated-card-1 {
+  animation: loading-animation-first-element 10s var(--loading-animation-first-element) infinite;
+  position: absolute;
+}
+
+.animated-card-2 {
+  animation: loading-animation-second-element 10s var(--loading-animation-second-element) infinite;
+  position: absolute;
+}
+
+.animated-card-3 {
+  animation: loading-animation-third-element 10s var(--loading-animation-third-element) infinite;
+  position: absolute;
+}
+
+.animated-card-4 {
+  animation: loading-animation-four-element 10s var(--loading-animation-four-element) infinite;
+  position: absolute;
 }

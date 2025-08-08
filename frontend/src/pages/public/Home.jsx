@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
-import ProjectCard from '../components/project/ProjectCard.jsx';
-import { getAllProject } from '../service/requestProject.jsx';
+import ProjectCard from '../../components/project/ProjectCard.jsx';
+import { Link } from 'react-router';
+import { getAllProject } from '../../service/requestProject.jsx';
 
 function Home() {
     const [project, setProject] = useState([]);
@@ -10,7 +11,6 @@ function Home() {
             const data = await getAllProject();
             setProject(data);
         };
-
         handleRequest();
     }, []);
 
@@ -63,6 +63,9 @@ function Home() {
             {/* Timeline */}
             <section id="timeline" className="min-h-screen px-4 sm:px-12 py-8 bg-white">
                 <h3 className="text-2xl sm:text-3xl font-semibold text-center">Timeline</h3>
+                <div className='w-[75%] mx-auto my-10 h-[80vh] border border-black rounded-xl'>
+
+                </div>
             </section>
 
             {/* À propos */}
@@ -78,6 +81,9 @@ function Home() {
             {/* Footer */}
             <footer className="p-4 text-center text-sm text-gray-500 bg-gray-100">
                 © {new Date().getFullYear()} Marcus Favernay. Tous droits réservés.
+                <ul>
+                    <li><Link to="/connexion">Se connecter</Link></li>
+                </ul>
             </footer>
         </>
     );
