@@ -7,27 +7,21 @@ services:
     App\:
         resource: '../src/'
 
-    # Authenticator personnalisé (lecture du token JWT depuis le cookie)
-    App\Security\JwtCookieAuthenticator:
-        autowire: true
-        autoconfigure: true
+    # Authenticator personnalisé (ex: JwtCookieAuthenticator)
+    App\Security\JwtCookieAuthenticator: ~
 
-    # Handler personnalisé à la connexion : génère le token et le met dans un cookie
+    # Handler personnalisé à la connexion : génère le token et le met dans un cookie,
+    # + personnalise le payload JWT via event subscriber
     App\Security\JWTAuthenticationSuccessHandler:
         arguments:
             $cookieName: 'BEARER'
             $cookieLifetime: 3600
-            $cookieSecure: '%env(bool:APP_COOKIE_SECURE)%'  # définir dans .env
+            $cookieSecure: '%env(bool:APP_COOKIE_SECURE)%'  # définir dans .env (false en dev)
             $cookieSameSite: 'Lax'
         tags:
             - { name: kernel.event_subscriber }
 
-    # Listener qui ajoute le cookie JWT à la réponse après un login réussi
-    App\EventListener\JWTCreatedListener:
-        tags:
-            - { name: kernel.event_listener, event: lexik_jwt_authentication.on_authentication_success, method: onAuthenticationSuccessResponse }
-
-    # (Optionnel) LogoutHandler si tu veux supprimer le cookie au logout
+    # LogoutHandler pour supprimer le cookie au logout (optionnel)
     App\Security\LogoutHandler:
         tags:
             - { name: 'kernel.event_listener', event: 'Symfony\Component\Security\Http\Event\LogoutEvent', method: 'onLogout' }

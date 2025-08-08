@@ -1,18 +1,27 @@
 import { useState, useEffect } from 'react';
 import ProjectCard from '../../components/project/ProjectCard.jsx';
 import { Link } from 'react-router';
-import { getAllProject } from '../../service/requestProject.jsx';
+import { getProjectByType } from '../../service/requestProject.jsx';
+import ProjectPopUp from "../../components/project/ProjectPopUp.jsx";
 
 function Home() {
+    const [projectType, setProjectType] = useState('Tout');
     const [project, setProject] = useState([]);
+    const [selectedProject, setSelectedProject] = useState(null);
 
+    const handleProjectType = (value) => {
+        setProjectType(value);
+    }
+
+    // element qui s'afficherrons aprés un changement
     useEffect(() => {
         const handleRequest = async () => {
-            const data = await getAllProject();
+            const data = await getProjectByType(projectType);
             setProject(data);
         };
         handleRequest();
-    }, []);
+    },[projectType]);
+
 
     return (
         <>
@@ -39,9 +48,10 @@ function Home() {
             {/* Projects Section */}
             <section id="project" className="min-h-screen px-4 sm:px-12 py-8 bg-gray-50">
                 <h3 className="text-2xl sm:text-3xl font-semibold mb-6 text-center">Projets</h3>
+
                 <div className="flex flex-wrap justify-center gap-3 sm:gap-4 mb-8">
                     {['Tout', 'Projets professionnels', 'Projets personnels', 'POC', 'Projets encadrés'].map(label => (
-                        <button key={label} className="px-4 py-2 border border-indigo-600 rounded hover:bg-indigo-100 text-sm sm:text-base">
+                        <button key={label} onClick={() => handleProjectType(label)} className="px-4 py-2 border border-indigo-600 rounded cursor-pointer hover:bg-indigo-100 text-sm sm:text-base">
                             {label}
                         </button>
                     ))}
@@ -49,8 +59,9 @@ function Home() {
 
                 <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
                     {Array.isArray(project) && project.length > 0 ? (
-                        project.map((p) => (
-                        <ProjectCard key={p.id} project={p} />
+                        project.map((element) => (
+                        <ProjectCard key={element.id} project={element} 
+                        onClick={() => setSelectedProject(element)}/>
                     ))
                     ) : ( 
                     <div className="col-span-full text-center text-gray-500">
@@ -85,6 +96,14 @@ function Home() {
                     <li><Link to="/connexion">Se connecter</Link></li>
                 </ul>
             </footer>
+
+            {/* PopUp affiché conditionnellement */}
+            {selectedProject && (
+              <ProjectPopUp
+                project={selectedProject}
+                onClose={() => setSelectedProject(null)}
+              />
+            )}
         </>
     );
 }

@@ -12,7 +12,7 @@ when@test:
     framework:
         handler_id: null           # Utilise le handler PHP par défaut
         cookie_secure: auto        # secure si HTTPS, sinon non (pratique en dev)
-        cookie_samesite: none      # IMPORTANT pour les cookies cross-origin
+        cookie_samesite: lax      # IMPORTANT pour les cookies cross-origin
         cookie_httponly: true
         test: true
         session:

@@ -3,6 +3,7 @@
 namespace App\Controller;
 
 use App\Repository\ProjectRepository;
+use App\Repository\CategoryRepository;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\HttpFoundation\JsonResponse;
@@ -10,27 +11,32 @@ use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 
 class ProjectController extends AbstractController
 {
-    #[Route('/api/projects', name: "api_projects_all", methods: ['GET'])]
-    public function listProjects(ProjectRepository $repository): JsonResponse
-    {
-        $projects = $repository->findAll();
-
-        return $this->json($projects, 200, [], ['groups' => 'public']);
-    }
-
     #[Route('/api/projects/find', name: "api_projects_by_category", methods: ['POST'])]
-    public function listTypeProjects(ProjectRepository $repository, Request $request): JsonResponse
+    public function listTypeProjects(ProjectRepository $repository,CategoryRepository $categoryRepository, Request $request): JsonResponse
     {
         $data = json_decode($request->getContent(), true);
 
-        if (!isset($data['categories']) || !is_array($data['categories'])) {
-            return $this->json(['error' => 'Missing or invalid categories.'], 400);
+        if (!isset($data['categories'])) {
+            return $this->json(['error' => $data['categories']], 400);
         }
 
-        // Exemple : $data['categories'] = ['dev', 'design'];
-        $projects = $repository->findByCategories($data['categories']);
+        if ($data['categories'] == 'Tout') {
+            $projects = $repository->findAll();
+            return $this->json($projects, 200, [], ['groups' => 'public']);
+        }
 
-        return $this->json($projects, 200, [], ['groups' => 'project:read']);
+
+        $categories = $categoryRepository->findAllNames();
+
+        $projects = [];
+
+        foreach($categories as $category){
+            if($category["name"] == $data['categories']){
+                $projects = $repository->findByCategories($data['categories']);
+            }
+        }        
+
+        return $this->json($projects, 200, [], ['groups' => 'public']);
     }
 
     #[Route('/api/project/create', name: "api_project_create", methods: ['POST'])]

@@ -13,18 +13,13 @@ use Symfony\Component\Security\Http\Authenticator\Passport\SelfValidatingPasspor
 
 class JwtCookieAuthenticator extends AbstractAuthenticator
 {
-    public function __construct(
-        private JWTTokenManagerInterface $jwtManager
-    ) {}
+    public function __construct(private JWTTokenManagerInterface $jwtManager) {}
 
     public function supports(Request $request): bool
     {
-        // Ignore les requêtes préflight CORS
         if ($request->getMethod() === 'OPTIONS') {
             return false;
         }
-
-        // On ne supporte que si le cookie est présent
         return $request->cookies->has('BEARER');
     }
 
@@ -42,9 +37,7 @@ class JwtCookieAuthenticator extends AbstractAuthenticator
             throw new AuthenticationException('Invalid JWT token payload');
         }
 
-        return new SelfValidatingPassport(
-            new UserBadge($payload['username'])
-        );
+        return new SelfValidatingPassport(new UserBadge($payload['username']));
     }
 
     public function onAuthenticationFailure(Request $request, AuthenticationException $exception): ?Response
@@ -58,7 +51,6 @@ class JwtCookieAuthenticator extends AbstractAuthenticator
 
     public function onAuthenticationSuccess(Request $request, TokenInterface $token, string $firewallName): ?Response
     {
-        // Authentification réussie → continuer sans interruption
-        return null;
+        return null; // Continue request
     }
 }

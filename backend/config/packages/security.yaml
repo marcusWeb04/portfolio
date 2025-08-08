@@ -23,7 +23,7 @@ security:
         # Firewall pour sécuriser toutes les autres routes /api
         api:
             pattern: ^/api
-            stateless: false
+            stateless: true
             custom_authenticators:
                 - App\Security\JwtCookieAuthenticator
 

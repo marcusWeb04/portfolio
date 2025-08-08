@@ -4,7 +4,6 @@ namespace App\Security;
 
 use Lexik\Bundle\JWTAuthenticationBundle\Event\AuthenticationSuccessEvent;
 use Lexik\Bundle\JWTAuthenticationBundle\Events;
-use Lexik\Bundle\JWTAuthenticationBundle\Response\JWTAuthenticationSuccessResponse;
 use Lexik\Bundle\JWTAuthenticationBundle\Services\JWTTokenManagerInterface;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\HttpFoundation\Cookie;
@@ -20,14 +19,14 @@ class JWTAuthenticationSuccessHandler implements AuthenticationSuccessHandlerInt
         private JWTTokenManagerInterface $jwtManager,
         private string $cookieName = 'BEARER',
         private int $cookieLifetime = 3600,
-        private bool $cookieSecure = false, // true en production
+        private bool $cookieSecure = false, // true en prod
         private string $cookieSameSite = 'Lax'
     ) {}
 
     public function onAuthenticationSuccess(Request $request, TokenInterface $token): JsonResponse
     {
         $user = $token->getUser();
-        
+
         if (!$user instanceof UserInterface) {
             throw new \RuntimeException('Invalid user type');
         }
@@ -64,15 +63,14 @@ class JWTAuthenticationSuccessHandler implements AuthenticationSuccessHandlerInt
 
     public function onJWTCreated(AuthenticationSuccessEvent $event): void
     {
-        // Optionnel : personnaliser le payload JWT ici
         $data = $event->getData();
         $user = $event->getUser();
-        
-        // Ajouter des données personnalisées au token
+
+        // Ajouter des données personnalisées dans le payload JWT
         if (method_exists($user, 'getId')) {
             $data['user_id'] = $user->getId();
         }
-        
+
         $event->setData($data);
     }
 }
