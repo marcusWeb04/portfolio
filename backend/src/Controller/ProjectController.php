@@ -12,31 +12,46 @@ use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 class ProjectController extends AbstractController
 {
     #[Route('/api/projects/find', name: "api_projects_by_category", methods: ['POST'])]
-    public function listTypeProjects(ProjectRepository $repository,CategoryRepository $categoryRepository, Request $request): JsonResponse
+    public function listTypeProjects(ProjectRepository $repository, CategoryRepository $categoryRepository, Request $request): JsonResponse
     {
         $data = json_decode($request->getContent(), true);
-
+    
         if (!isset($data['categories'])) {
-            return $this->json(['error' => $data['categories']], 400);
+            return $this->json(['error' => 'Paramètre categories manquant'], 400);
         }
-
-        if ($data['categories'] == 'Tout') {
+    
+        $limit = isset($data['limit']) ? (int)$data['limit'] : 7;
+    
+        if ($data['categories'] === 'Tout') {
             $projects = $repository->findAll();
             return $this->json($projects, 200, [], ['groups' => 'public']);
         }
-
-
-        $categories = $categoryRepository->findAllNames();
-
-        $projects = [];
-
-        foreach($categories as $category){
-            if($category["name"] == $data['categories']){
-                $projects = $repository->findByCategories($data['categories']);
-            }
-        }        
-
+    
+        // Trouver la catégorie demandée
+        $category = $categoryRepository->findOneBy(['name' => $data['categories']]);
+        if (!$category) {
+            return $this->json(['error' => 'Catégorie inconnue'], 400);
+        }
+    
+        // Supposons que findByCategory accepte un paramètre $limit
+        $projects = $repository->findByCategory($category, $limit);
+    
         return $this->json($projects, 200, [], ['groups' => 'public']);
+    }
+
+    #[Route('/api/project/info', name:"api_projects_pagination", methods:['POST'])]
+    public function paginationProjects(ProjectRepository $repository, Request $request): JsonResponse
+    {
+        $data = json_decode($request->getContent(), true);
+        $limit = $data['limit'] ?? 7;
+        $page = $data['page'] ?? 1;
+        
+        $offset = ($page - 1) * $limit;
+        
+        $projects = $repository->findWithPagination($limit, $offset);
+        
+        return $this->json($projects, 200, [], ['groups' => 'public']);
+        
     }
 
     #[Route('/api/project/create', name: "api_project_create", methods: ['POST'])]

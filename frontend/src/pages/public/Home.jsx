@@ -5,8 +5,9 @@ import { getProjectByType } from '../../service/requestProject.jsx';
 import ProjectPopUp from "../../components/project/ProjectPopUp.jsx";
 
 function Home() {
-    const [projectType, setProjectType] = useState('Tout');
+    const [limit, setLimit] = useState(7);
     const [project, setProject] = useState([]);
+    const [projectType, setProjectType] = useState('Tout');
     const [selectedProject, setSelectedProject] = useState(null);
 
     const handleProjectType = (value) => {
@@ -16,11 +17,11 @@ function Home() {
     // element qui s'afficherrons aprés un changement
     useEffect(() => {
         const handleRequest = async () => {
-            const data = await getProjectByType(projectType);
+            const data = await getProjectByType({projectType,limit});
             setProject(data);
         };
         handleRequest();
-    },[projectType]);
+    },[projectType, limit]);
 
 
     return (
