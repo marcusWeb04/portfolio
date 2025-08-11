@@ -39,6 +39,25 @@ export async function checkAuth() {
   }
 }
 
+export async function logOut(){
+  try {
+    const response = await fetch(`${API_BASE_URL}/api/logout`,{
+      method: "POST",
+      credentials: 'include',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+    });
+
+    if (!response.ok) {
+      return false;
+    }
+  } catch (error) {
+    console.error("Erreur API:", error);
+    return false;
+  }
+}
+
 // fetch('http://127.0.0.1:8000/api/nom-de-la-route', {
 //   credentials: 'include',
 // })
