@@ -12,6 +12,10 @@ function ProjectPage(){
     const [projectType, setProjectType] = useState('Tout');
     const [selectedProject, setSelectedProject] = useState(null);
 
+    const handleSubmit = (event) =>{
+        event.prevault();
+    } 
+
     useEffect(()=>{
         const handleRequest = async () => {
             const data = await getProjectPagination({page,limit});
@@ -25,7 +29,21 @@ function ProjectPage(){
     return (
         <div className="flex">
             <Aside />
-            <div className="flex flex-col h-[95vh] w-full">
+            <div className="flex flex-col h-[100vh] w-full">
+                <div className="flex">
+                    <form action="#" className="w-[20%] ml-[5%] flex content-around" onSubmit={() => handleSubmit()}>
+                        <label htmlFor="Categorie">Categories</label>
+                        <select className="mx-2 border-none outline-0" name="#" id="#">
+                            <option value=""></option>
+                            <option value="">guitar</option>
+                            <option value="">guitar</option>
+                            <option value="">guitar</option>
+                        </select>
+                        <button>Valider</button>
+                    </form>
+                    <button className="cursor-pointer">Ajouter</button>
+                </div>
+                {/* tableau */}
                 <table className="border-collapse">
                     <thead className="bg-gray-100">
                         <tr>
@@ -65,7 +83,6 @@ function ProjectPage(){
                       ))}
                     </tbody>
                 </table>
-
                 {/* PopUp affiché conditionnellement */}
                 {selectedProject && (
                   <ProjectPopUp
@@ -73,7 +90,6 @@ function ProjectPage(){
                     onClose={() => setSelectedProject(null)}
                   />
                 )}
-
                 {/* Pagination */}
                 <div className="flex justify-center space-x-2 mt-auto">
                     <button
