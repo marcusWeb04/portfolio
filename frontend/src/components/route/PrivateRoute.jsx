@@ -1,11 +1,22 @@
-// src/components/PrivateRoute.jsx
 import { Navigate } from 'react-router';
 import { checkAuth } from '../../service/requestUser';
+import { useEffect, useState } from 'react';
+import LoadingPage from '../../pages/loading/LoadingPage';
 
 export default function PrivateRoute({ children }) {
-  const { user, loading } = checkAuth();
+  const [isAuthenticated, setIsAuthenticated] = useState(null);
 
-  if (loading) return <p>Chargement...</p>;
+  useEffect(() => {
+    const fetchAuth = async () => {
+      const result = await checkAuth();
+      setIsAuthenticated(!!result);
+    };
+    fetchAuth();
+  }, []);
 
-  return user ? children : <Navigate to="/connexion" />;
+  if (isAuthenticated === null) {
+    return <LoadingPage/>;
+  }
+
+  return isAuthenticated ? children : <Navigate to="/connexion" />;
 }

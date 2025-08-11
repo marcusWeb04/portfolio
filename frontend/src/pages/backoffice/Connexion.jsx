@@ -1,7 +1,6 @@
 import { useState } from "react";
 import { Link, useNavigate } from "react-router";
 import { login } from "../../service/requestUser";
-import {API_VITE_JWT} from "../../service/api";
 
 function Connexion() {
   const navigate = useNavigate();
@@ -26,7 +25,7 @@ function Connexion() {
     try {
       const res = await login(formData);
       if(res.code==204){
-        navigate("/myProfil");
+        navigate("/dashboard");
       }
     } catch (error) {
       console.error('Erreur de connexion :', error);
