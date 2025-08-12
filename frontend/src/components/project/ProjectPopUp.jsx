@@ -1,6 +1,6 @@
 function ProjectPopUp({ project, onClose }) {
-  const handleOverlayClick = (e) => {
-    if (e.target === e.currentTarget) {
+  const handleOverlayClick = (element) => {
+    if (element.target === element.currentTarget) {
       onClose();
     }
   };

@@ -53,6 +53,7 @@ export async function projectCreate(project){
     try {
         const response = await fetch(`${API_BASE_URL}/api/project/create`,{
             method: "POST",
+            credentials: 'include',
             headers: {
                 accept: 'application/json',
             },
@@ -77,6 +78,7 @@ export async function projectEdit(project){
     try {
         const response = await fetch(`${API_BASE_URL}/api/project/edit/${project.id}`,{
             method: "PUT",
+            credentials: 'include',
             headers: {
                 accept: 'application/json',
                 Authorization: `Bearer ${token}`,
@@ -102,9 +104,9 @@ export async function projectDelete(project){
      try {
         const response = await fetch(`${API_BASE_URL}/api/project/edit/${project.id}`,{
             method: "DELETE",
+            credentials: 'include',
             headers: {
                 accept: 'application/json',
-                Authorization: `Bearer ${token}`,
             },
         });
 
