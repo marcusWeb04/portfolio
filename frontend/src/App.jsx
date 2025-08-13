@@ -17,6 +17,8 @@ const Connexion = React.lazy(() => import('./pages/backoffice/Connexion'));
 const Dashbord = React.lazy(() => import('./pages/backoffice/Dashbord'));
 const UserProfile = React.lazy(() => import('./pages/backoffice/UserProfile'));
 const LogOut = React.lazy(() => import('./pages/backoffice/LogOut'));
+// backoffice-project
+const ProjectPage = React.lazy(() => import('./pages/backoffice/project/ProjectPage'));
 
 function App() {
   return (
@@ -27,10 +29,11 @@ function App() {
         <Route path='/connexion' element={<Connexion />}/>
 
         {/* Route protégé */}
-
         <Route path='/dashboard' element={<PrivateRoute> <Dashbord /> </PrivateRoute>}/>
         <Route path='/myProfil' element={<PrivateRoute> <UserProfile/> </PrivateRoute>}/>
-        <Route path='/logout' element={<PrivateRoute><LogOut/></PrivateRoute>}/>
+        <Route path='/logout' element={<PrivateRoute> <LogOut/> </PrivateRoute>}/>
+        {/* Route Protégé projet */}
+        <Route path='/projectBord' element={<PrivateRoute> <ProjectPage/> </PrivateRoute>} />
       </Routes>
     </Suspense>
   );

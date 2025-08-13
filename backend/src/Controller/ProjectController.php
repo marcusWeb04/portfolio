@@ -2,77 +2,96 @@
 
 namespace App\Controller;
 
+use App\Entity\Image;
+use App\Entity\Project;
 use App\Repository\ProjectRepository;
 use App\Repository\CategoryRepository;
+use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 
+
 class ProjectController extends AbstractController
 {
     #[Route('/api/projects/find', name: "api_projects_by_category", methods: ['POST'])]
-    public function listTypeProjects(ProjectRepository $repository,CategoryRepository $categoryRepository, Request $request): JsonResponse
+    public function listTypeProjects(ProjectRepository $repository, CategoryRepository $categoryRepository, Request $request): JsonResponse
     {
         $data = json_decode($request->getContent(), true);
-
+    
         if (!isset($data['categories'])) {
-            return $this->json(['error' => $data['categories']], 400);
+            return $this->json(['error' => 'Paramètre categories manquant'], 400);
         }
-
-        if ($data['categories'] == 'Tout') {
+    
+        $limit = isset($data['limit']) ? (int)$data['limit'] : 7;
+    
+        if ($data['categories'] === 'Tout') {
             $projects = $repository->findAll();
             return $this->json($projects, 200, [], ['groups' => 'public']);
         }
-
-
-        $categories = $categoryRepository->findAllNames();
-
-        $projects = [];
-
-        foreach($categories as $category){
-            if($category["name"] == $data['categories']){
-                $projects = $repository->findByCategories($data['categories']);
-            }
-        }        
-
+    
+        // Trouver la catégorie demandée
+        $category = $categoryRepository->findOneBy(['name' => $data['categories']]);
+        if (!$category) {
+            return $this->json(['error' => 'Catégorie inconnue'], 400);
+        }
+    
+        // Supposons que findByCategory accepte un paramètre $limit
+        $projects = $repository->findByCategory($category, $limit);
+    
         return $this->json($projects, 200, [], ['groups' => 'public']);
     }
 
-    #[Route('/api/project/create', name: "api_project_create", methods: ['POST'])]
-    public function createProject(Request $request,EntityManagerInterface $entityManager,CategoryRepository $categoryRepository): JsonResponse 
+    #[Route('/api/project/info', name:"api_projects_pagination", methods:['POST'])]
+    public function paginationProjects(ProjectRepository $repository, Request $request): JsonResponse
     {
         $data = json_decode($request->getContent(), true);
+        $limit = $data['limit'] ?? 7;
+        $page = $data['page'] ?? 1;
+        
+        $offset = ($page - 1) * $limit;
+        
+        $projects = $repository->findWithPagination($limit, $offset);
+        
+        return $this->json($projects, 200, [], ['groups' => 'public']);
+        
+    }
 
-        if (!$data) {
-            return $this->json(['error' => 'Invalid JSON'], 400);
-        }
-
-        // Validation simple
-        if (empty($data['title']) || empty($data['link']) || empty($data['description'])) {
-            return $this->json(['error' => 'Missing required fields'], 400);
-        }
-
+    #[Route('/api/project/create', name: "api_project_create", methods: ['POST'])]
+    public function createProject( Request $request, EntityManagerInterface $entityManager, CategoryRepository $categoryRepository): JsonResponse 
+    {
         $project = new Project();
-        $project->setTitle($data['title']);
-        $project->setLink($data['link']);
-        $project->setDescription($data['description']);
+        $project->setTitle($request->request->get('title') ?? '');
+        $project->setLink($request->request->get('link') ?? '');
+        $project->setDescription($request->request->get('description') ?? '');
 
-        // Gérer les catégories (facultatif)
-        if (!empty($data['category_ids']) && is_array($data['category_ids'])) {
-            foreach ($data['category_ids'] as $categoryId) {
-                $category = $categoryRepository->find($categoryId);
-                if ($category) {
-                    $project->addCategory($category);
-                }
+        // Catégories
+        $categoryIds = $request->request->all('categories') ?? [];
+        foreach ($categoryIds as $categoryId) {
+            $category = $categoryRepository->find($categoryId);
+            if ($category) {
+                $project->addCategory($category);
             }
+        }
+
+        // Image
+        $file = $request->files->get('image');
+        if ($file) {
+            $image = new Image();
+            $image->setName($file->getClientOriginalName());
+            $image->setFile($file); // VichUploader gère l'upload
+            $entityManager->persist($image);
+
+            $project->setImage($image); // Associe l'image au projet
         }
 
         $entityManager->persist($project);
         $entityManager->flush();
 
-        return $this->json($project, 201, [], ['groups' => 'project:read']);
+        return $this->json($project, 201, [], ['groups' => 'public']);
     }
+
 
     #[Route('/api/project/edit/{id}', name: 'api_project_edit', methods: ['PUT'])]
     public function editProject(int $id,Request $request,ProjectRepository $projectRepository,CategoryRepository $categoryRepository,EntityManagerInterface $entityManager): JsonResponse 
@@ -118,12 +137,12 @@ class ProjectController extends AbstractController
     }
 
     #[Route('/api/project/delete/{id}', name: 'api_project_delete', methods: ['DELETE'])]
-    public function deleteProject( int $id, ProjectRepository $projectRepository, EntityManagerInterface $entityManager): JsonResponse
+    public function deleteProject( string $id, ProjectRepository $projectRepository, EntityManagerInterface $entityManager): JsonResponse
     {
-        $project = $projectRepository->find($id);
+        $project = $projectRepository->find((int)$id);
 
         if (!$project) {
-            return $this->json(['error' => 'Project not found'], 404);
+            return $this->json(['error' => $id], 404);
         }
 
         $entityManager->remove($project);

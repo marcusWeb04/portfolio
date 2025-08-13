@@ -16,10 +16,11 @@ class CategoryRepository extends ServiceEntityRepository
         parent::__construct($registry, Category::class);
     }
 
-    public function findAllNames(): array
+    public function findAllNames(int $limit): array
     {
         return $this->createQueryBuilder('c')
             ->select('c.name')
+            ->setMaxResults($limit)
             ->getQuery()
             ->getScalarResult();
     }

@@ -2,24 +2,32 @@
 
 namespace App\Entity;
 
-use App\Repository\ImageRepository;
-use Doctrine\Common\Collections\ArrayCollection;
-use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
+use App\Repository\ImageRepository;
+use Doctrine\Common\Collections\Collection;
+use Doctrine\Common\Collections\ArrayCollection;
+use Symfony\Component\Serializer\Annotation\Groups;
+use Symfony\Component\HttpFoundation\File\File;
+use Vich\UploaderBundle\Mapping\Annotation as Vich;
 
 #[ORM\Entity(repositoryClass: ImageRepository::class)]
+#[Vich\Uploadable]
 class Image
 {
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
+    #[Groups(["private"])]
     private ?int $id = null;
 
+    #[Groups(["public"])]
     #[ORM\Column(length: 255)]
     private ?string $name = null;
 
-    #[ORM\Column(length: 255)]
-    private ?string $link = null;
+    // Fichier pour l'upload
+    #[Groups(["private"])]
+    #[Vich\UploadableField(mapping: 'images', fileNameProperty: 'fileName')]
+    private ?File $file = null;
 
     /**
      * @var Collection<int, Project>
@@ -44,6 +52,13 @@ class Image
         return $this->id;
     }
 
+    #[Groups(['public'])]
+    public function getImageUrl(): ?string
+    {
+        return $this->name ? '/uploads/images/' . $this->name : null;
+    }
+
+
     public function getName(): ?string
     {
         return $this->name;
@@ -56,17 +71,21 @@ class Image
         return $this;
     }
 
-    public function getLink(): ?string
+    
+    public function setFile(?File $file = null): void
     {
-        return $this->link;
+        $this->file = $file;
+
+        if ($file) {
+            $this->updatedAt = new \DateTimeImmutable();
+        }
     }
 
-    public function setLink(string $link): static
+    public function getFile(): ?File
     {
-        $this->link = $link;
-
-        return $this;
+        return $this->file;
     }
+
 
     /**
      * @return Collection<int, Project>

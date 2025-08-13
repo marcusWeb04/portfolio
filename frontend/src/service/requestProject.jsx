@@ -1,18 +1,46 @@
 import {API_BASE_URL} from "./api";
 
-export async function getProjectByType(types){
+export async function getProjectByType({ projectType, limit }) {
     try {
-        const response = await fetch(`${API_BASE_URL}/api/projects/find`,{
+        const response = await fetch(`${API_BASE_URL}/api/projects/find`, {
             method: "POST",
             headers: {
-                accept: 'application/json',
+                Accept: "application/json",
             },
-            body: JSON.stringify(
-                {
-                    "categories" : types,
-                }
-            ),
+            body: JSON.stringify({
+                categories: projectType,
+                limit: limit,
+            }),
         });
+
+        if (!response.ok) {
+            throw new Error(`Erreur API: ${response.status}`);
+        }
+
+        return await response.json();
+    } catch (error) {
+        console.error("Erreur API:", error);
+        throw error;
+    }
+}
+
+export async function getProjectPagination({page,limit}){
+        try {
+        const response = await fetch(`${API_BASE_URL}/api/project/info`, {
+            method: "POST",
+            credentials: 'include',
+            headers: {
+                Accept: "application/json",
+            },
+            body: JSON.stringify({
+                page: page,
+                limit: limit,
+            }),
+        });
+
+        if (!response.ok) {
+            throw new Error(`Erreur API: ${response.status}`);
+        }
 
         return await response.json();
     } catch (error) {
@@ -25,9 +53,9 @@ export async function projectCreate(project){
     try {
         const response = await fetch(`${API_BASE_URL}/api/project/create`,{
             method: "POST",
+            credentials: 'include',
             headers: {
                 accept: 'application/json',
-                Authorization: `Bearer ${token}`,
             },
             body: JSON.stringify(
                 {
@@ -50,6 +78,7 @@ export async function projectEdit(project){
     try {
         const response = await fetch(`${API_BASE_URL}/api/project/edit/${project.id}`,{
             method: "PUT",
+            credentials: 'include',
             headers: {
                 accept: 'application/json',
                 Authorization: `Bearer ${token}`,
@@ -75,9 +104,9 @@ export async function projectDelete(project){
      try {
         const response = await fetch(`${API_BASE_URL}/api/project/edit/${project.id}`,{
             method: "DELETE",
+            credentials: 'include',
             headers: {
                 accept: 'application/json',
-                Authorization: `Bearer ${token}`,
             },
         });
 

@@ -16,6 +16,16 @@ class ProjectRepository extends ServiceEntityRepository
         parent::__construct($registry, Project::class);
     }
 
+    public function findWithPagination(int $limit, int $offset): array
+    {
+        return $this->createQueryBuilder('p')
+            ->setMaxResults($limit)
+            ->setFirstResult($offset)
+            ->getQuery()
+            ->getResult();
+    }
+
+
 //    /**
 //     * @return Project[] Returns an array of Project objects
 //     */
