@@ -2,25 +2,29 @@ import { useState, useEffect } from "react";
 import { projectCreate,projectEdit,projectDelete } from "../../../service/requestProject";
 
 export default function Form({ children, onClose }) {
+
   const [project, setProject] = useState({
     image: null,
     title: "",
     description: "",
+    link: "",
   });
 
   // Mise à jour de l'état quand on ouvre le formulaire
   useEffect(() => {
     if (children.action === "update" && children.project) {
       setProject({
-        image: null, // on ne peut pas préremplir un fichier
+        image: null,
+        link: children.project.link || "",
         title: children.project.title || "",
         description: children.project.description || "",
       });
     }
     if (children.action === "add") {
       setProject({
-        image: null,
+        link: "",
         title: "",
+        image: null,
         description: "",
       });
     }
@@ -48,7 +52,12 @@ export default function Form({ children, onClose }) {
     e.preventDefault();
     try {
         // Ici tu peux envoyer les données (ex: API, state parent...)
-        console.log("Projet soumis :", project);
+        if(children.action === "add"){
+          handleAdd();
+        }else{
+          handleEdit();
+        }
+        console.log("Projet soumis :", children.action);
         
         onClose(); // fermer le formulaire après soumission (optionnel)   
     } catch (error) {
@@ -56,11 +65,34 @@ export default function Form({ children, onClose }) {
     }
   };
 
+  // Ajouter un projet   
+  const handleAdd = async () => {
+    try {
+        // Logique suppression ici
+        console.log("Projet ajouté :", project);
+        await projectCreate({project});
+        onClose();
+    } catch (error) {
+        console.log(error);
+    }
+  }
+
+  // Modifier un projet 
+  const handleEdit = async () => {
+    try {
+        // Logique suppression ici
+        console.log("Projet Modifier :", project);
+        await projectEdit(project);
+        onClose();
+    } catch (error) {
+        console.log(error);
+    }
+  }
+
   // Suppresion du projet
   const handleDelete = async () =>{
     try {
         // Logique suppression ici
-        console.log("Projet supprimé :", children.project);
         await projectDelete(children.project.id);
         onClose();
     } catch (error) {
@@ -90,6 +122,17 @@ export default function Form({ children, onClose }) {
               type="text"
               name="title"
               value={project.title}
+              onChange={handleChange}
+            />
+          </div>
+
+          {/* Liens */}
+          <div className="text-xl font-bold mt-4">
+            <label htmlFor="link">lien du projet :</label>
+            <input
+              type="text"
+              name="link"
+              value={project.link}
               onChange={handleChange}
             />
           </div>
@@ -124,9 +167,9 @@ export default function Form({ children, onClose }) {
           <div className="mt-4 flex gap-4">
             <button
               type="button"
-              onClick={() => {
+              onClick={() => 
                 handleDelete()
-              }}
+              }
               className="bg-red-500 text-white px-4 py-2 rounded"
             >
               Oui

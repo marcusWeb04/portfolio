@@ -20,7 +20,7 @@ function ProjectPage() {
     const handleRequest = async () => {
       const data = await getProjectPagination({ page, limit });
       setContent(data);
-      console.log(data);
+      
     };
     handleRequest();
   }, [page, limit]);

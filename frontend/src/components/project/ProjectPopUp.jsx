@@ -1,3 +1,5 @@
+import { API_BASE_URL } from "../../service/api";
+
 function ProjectPopUp({ project, onClose }) {
   const handleOverlayClick = (element) => {
     if (element.target === element.currentTarget) {
@@ -18,8 +20,8 @@ function ProjectPopUp({ project, onClose }) {
           ❌
         </button>
         <img
-          src={project?.img?.link}
-          alt={project?.img?.description || "Image du projet"}
+          src={`${API_BASE_URL}/${project.imageUrl}`}
+          alt={project?.title || "Image du projet"}
           className="w-full h-auto rounded"
         />
         <h2 className="text-xl font-bold mt-4">{project.title}</h2>

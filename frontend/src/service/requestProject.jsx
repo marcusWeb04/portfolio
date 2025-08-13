@@ -49,29 +49,32 @@ export async function getProjectPagination({page,limit}){
     }
 }
 
-export async function projectCreate(project){
-    try {
-        const response = await fetch(`${API_BASE_URL}/api/project/create`,{
-            method: "POST",
-            credentials: 'include',
-            headers: {
-                accept: 'application/json',
-            },
-            body: JSON.stringify(
-                {
-                    "title" : project.title,
-                    "link" : project.link,
-                    "description" : project.description,
-                    "categories" : project.categories,
-                }
-            ),
-        });
-
-        return await response.json();
-    } catch (error) {
-        console.error("Erreur API:", error);
-        throw error;
+export async function projectCreate({ project }) {
+  try {
+    const formData = new FormData();
+    formData.append("title", project.title);
+    formData.append("link", project.link);
+    formData.append("description", project.description);
+    if (project.image) {
+      formData.append("image", project.image); // ton File
     }
+
+    // Si tu as un tableau de catégories (ex: [1, 2, 3])
+    project.categories?.forEach((catId, index) => {
+      formData.append(`categories[${index}]`, catId);
+    });
+
+    const response = await fetch(`${API_BASE_URL}/api/project/create`, {
+      method: "POST",
+      credentials: "include",
+      body: formData,
+    });
+
+    return await response.json();
+  } catch (error) {
+    console.error("Erreur API:", error);
+    throw error;
+  }
 }
 
 export async function projectEdit(project){
@@ -100,9 +103,9 @@ export async function projectEdit(project){
     }
 }
 
-export async function projectDelete(project){
+export async function projectDelete(id){
      try {
-        const response = await fetch(`${API_BASE_URL}/api/project/edit/${project.id}`,{
+        const response = await fetch(`${API_BASE_URL}/api/project/delete/${id}`,{
             method: "DELETE",
             credentials: 'include',
             headers: {

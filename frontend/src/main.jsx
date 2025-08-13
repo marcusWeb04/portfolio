@@ -5,11 +5,11 @@ import { ThemeProvider } from './service/ThemeSwitcher.jsx';
 import App from './App.jsx';
 
 createRoot(document.getElementById('root')).render(
-  <StrictMode>
+  // <StrictMode>
     <BrowserRouter>
         <ThemeProvider>
             <App />
         </ThemeProvider>
     </BrowserRouter>
-  </StrictMode>,
+  // </StrictMode>
 )
