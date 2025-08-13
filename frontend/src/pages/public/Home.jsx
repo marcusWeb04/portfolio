@@ -30,7 +30,6 @@ function Home() {
             <nav className="flex flex-col sm:flex-row sm:flex-wrap justify-center items-center gap-2 sm:gap-4 p-4 bg-gray-100 shadow">
                 <a href="#hero-section" className="border border-indigo-600 px-4 py-2 rounded-sm hover:bg-indigo-100 w-full sm:w-auto text-center">Accueil</a>
                 <a href="#project" className="border border-indigo-600 px-4 py-2 rounded-sm hover:bg-indigo-100 w-full sm:w-auto text-center">Projet</a>
-                <a href="#timeline" className="border border-indigo-600 px-4 py-2 rounded-sm hover:bg-indigo-100 w-full sm:w-auto text-center">Timeline</a>
                 <a href="#about-me" className="border border-indigo-600 px-4 py-2 rounded-sm hover:bg-indigo-100 w-full sm:w-auto text-center">À propos</a>
                 <a href="#contact-me" className="border border-indigo-600 px-4 py-2 rounded-sm hover:bg-indigo-100 w-full sm:w-auto text-center">Me contacter</a>
             </nav>
@@ -56,9 +55,10 @@ function Home() {
                             {label}
                         </button>
                     ))}
+
                 </div>
 
-                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-9">
                     {Array.isArray(project) && project.length > 0 ? (
                         project.map((element) => (
                         <ProjectCard key={element.id} project={element} 
@@ -69,14 +69,6 @@ function Home() {
                          Aucun projet à afficher.
                     </div> 
                     )}
-                </div>
-            </section>
-
-            {/* Timeline */}
-            <section id="timeline" className="min-h-screen px-4 sm:px-12 py-8 bg-white">
-                <h3 className="text-2xl sm:text-3xl font-semibold text-center">Timeline</h3>
-                <div className='w-[75%] mx-auto my-10 h-[80vh] border border-black rounded-xl'>
-
                 </div>
             </section>
 
