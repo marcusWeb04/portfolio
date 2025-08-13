@@ -21,7 +21,7 @@ class Project
     #[Groups(["public", "private"])]
     private ?string $title = null;
 
-    #[ORM\Column(length: 255)]
+    #[ORM\Column(length: 255, nullable: true)]
     #[Groups(["public", "private"])]
     private ?string $link = null;
 
@@ -29,7 +29,7 @@ class Project
     #[Groups(["public", "private"])]
     private ?string $description = null;
 
-    #[ORM\ManyToOne(inversedBy: 'projects')]
+    #[ORM\ManyToOne(inversedBy: 'projects', cascade: ['persist'])]
     #[ORM\JoinColumn(nullable: true)]
     #[Groups(["public", "private"])]
     private ?Image $image = null;

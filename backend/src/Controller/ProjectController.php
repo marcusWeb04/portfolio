@@ -2,12 +2,16 @@
 
 namespace App\Controller;
 
+use App\Entity\Image;
+use App\Entity\Project;
 use App\Repository\ProjectRepository;
 use App\Repository\CategoryRepository;
+use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+
 
 class ProjectController extends AbstractController
 {
@@ -55,39 +59,39 @@ class ProjectController extends AbstractController
     }
 
     #[Route('/api/project/create', name: "api_project_create", methods: ['POST'])]
-    public function createProject(Request $request,EntityManagerInterface $entityManager,CategoryRepository $categoryRepository): JsonResponse 
+    public function createProject( Request $request, EntityManagerInterface $entityManager, CategoryRepository $categoryRepository): JsonResponse 
     {
-        $data = json_decode($request->getContent(), true);
-
-        if (!$data) {
-            return $this->json(['error' => 'Invalid JSON'], 400);
-        }
-
-        // Validation simple
-        if (empty($data['title']) || empty($data['link']) || empty($data['description'])) {
-            return $this->json(['error' => 'Missing required fields'], 400);
-        }
-
         $project = new Project();
-        $project->setTitle($data['title']);
-        $project->setLink($data['link']);
-        $project->setDescription($data['description']);
+        $project->setTitle($request->request->get('title') ?? '');
+        $project->setLink($request->request->get('link') ?? '');
+        $project->setDescription($request->request->get('description') ?? '');
 
-        // Gérer les catégories (facultatif)
-        if (!empty($data['category_ids']) && is_array($data['category_ids'])) {
-            foreach ($data['category_ids'] as $categoryId) {
-                $category = $categoryRepository->find($categoryId);
-                if ($category) {
-                    $project->addCategory($category);
-                }
+        // Catégories
+        $categoryIds = $request->request->all('categories') ?? [];
+        foreach ($categoryIds as $categoryId) {
+            $category = $categoryRepository->find($categoryId);
+            if ($category) {
+                $project->addCategory($category);
             }
+        }
+
+        // Image
+        $file = $request->files->get('image');
+        if ($file) {
+            $image = new Image();
+            $image->setName($file->getClientOriginalName());
+            $image->setFile($file); // VichUploader gère l'upload
+            $entityManager->persist($image);
+
+            $project->setImage($image); // Associe l'image au projet
         }
 
         $entityManager->persist($project);
         $entityManager->flush();
 
-        return $this->json($project, 201, [], ['groups' => 'project:read']);
+        return $this->json($project, 201, [], ['groups' => 'public']);
     }
+
 
     #[Route('/api/project/edit/{id}', name: 'api_project_edit', methods: ['PUT'])]
     public function editProject(int $id,Request $request,ProjectRepository $projectRepository,CategoryRepository $categoryRepository,EntityManagerInterface $entityManager): JsonResponse 
@@ -133,12 +137,12 @@ class ProjectController extends AbstractController
     }
 
     #[Route('/api/project/delete/{id}', name: 'api_project_delete', methods: ['DELETE'])]
-    public function deleteProject( int $id, ProjectRepository $projectRepository, EntityManagerInterface $entityManager): JsonResponse
+    public function deleteProject( string $id, ProjectRepository $projectRepository, EntityManagerInterface $entityManager): JsonResponse
     {
-        $project = $projectRepository->find($id);
+        $project = $projectRepository->find((int)$id);
 
         if (!$project) {
-            return $this->json(['error' => 'Project not found'], 404);
+            return $this->json(['error' => $id], 404);
         }
 
         $entityManager->remove($project);
